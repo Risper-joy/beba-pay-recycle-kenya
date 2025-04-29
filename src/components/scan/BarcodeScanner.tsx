@@ -1,25 +1,13 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Barcode, Recycle } from 'lucide-react';
+import { useBottleScan } from '@/hooks/useBottleScan';
+import { useAuth } from '@/contexts/AuthContext';
 
 const BarcodeScanner: React.FC = () => {
-  const [scanning, setScanning] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
+  const { scanning, result, startScanning } = useBottleScan();
+  const { user } = useAuth();
   
-  const startScanning = () => {
-    setScanning(true);
-    setResult(null);
-    
-    // In a real app, we would activate the camera here
-    // For now, we'll simulate a scan after 2 seconds
-    setTimeout(() => {
-      const mockBarcodes = ['9781234567897', '5901234123457', '4006381333931'];
-      const randomBarcode = mockBarcodes[Math.floor(Math.random() * mockBarcodes.length)];
-      setResult(randomBarcode);
-      setScanning(false);
-    }, 2000);
-  };
-
   return (
     <div className="bebapay-card max-w-md mx-auto">
       <h2 className="text-2xl font-bold text-gray-900 mb-4">Scan Bottle Barcode</h2>
@@ -38,7 +26,7 @@ const BarcodeScanner: React.FC = () => {
               </div>
               <h3 className="text-lg font-medium text-center">Bottle Scanned!</h3>
               <p className="mt-2 text-sm text-gray-600 text-center">Barcode: {result}</p>
-              <p className="mt-4 text-center font-medium text-bebapay-green">+5 BebaPay Tokens</p>
+              <p className="mt-4 text-center font-medium text-bebapay-green">Tokens Added to Wallet</p>
             </div>
           </div>
         ) : (
@@ -53,11 +41,17 @@ const BarcodeScanner: React.FC = () => {
       
       <button
         onClick={startScanning}
-        disabled={scanning}
-        className={`bebapay-button w-full ${scanning ? 'opacity-50 cursor-not-allowed' : ''}`}
+        disabled={scanning || !user}
+        className={`bebapay-button w-full ${scanning || !user ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         {scanning ? 'Scanning...' : result ? 'Scan Another Bottle' : 'Start Scanning'}
       </button>
+      
+      {!user && (
+        <p className="mt-3 text-sm text-bebapay-orange text-center">
+          Please sign in to scan bottles and earn tokens.
+        </p>
+      )}
       
       <div className="mt-6 text-sm text-gray-600">
         <p className="font-medium mb-2">Instructions:</p>
