@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Barcode, Recycle } from 'lucide-react';
+import React, { useState } from 'react';
+import { ScanBarcode, Recycle } from 'lucide-react';
 import { useBottleScan } from '@/hooks/useBottleScan';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -31,7 +31,7 @@ const BarcodeScanner: React.FC = () => {
           </div>
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <Barcode className="h-16 w-16 text-gray-400 mb-4" />
+            <ScanBarcode className="h-16 w-16 text-gray-400 mb-4" />
             <p className="text-gray-500 text-center px-8">
               Position the barcode within the camera view to scan
             </p>
