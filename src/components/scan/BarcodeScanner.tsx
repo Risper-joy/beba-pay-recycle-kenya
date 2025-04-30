@@ -2,11 +2,10 @@
 import React, { useState } from 'react';
 import { ScanBarcode, Recycle } from 'lucide-react';
 import { useBottleScan } from '@/hooks/useBottleScan';
-import { useAuth } from '@/contexts/AuthContext';
 
 const BarcodeScanner: React.FC = () => {
   const { scanning, result, startScanning } = useBottleScan();
-  const { user } = useAuth();
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // For demonstration purpose, default to true
   
   return (
     <div className="bebapay-card max-w-md mx-auto">
@@ -41,13 +40,13 @@ const BarcodeScanner: React.FC = () => {
       
       <button
         onClick={startScanning}
-        disabled={scanning || !user}
-        className={`bebapay-button w-full ${scanning || !user ? 'opacity-50 cursor-not-allowed' : ''}`}
+        disabled={scanning || !isLoggedIn}
+        className={`bebapay-button w-full ${scanning || !isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         {scanning ? 'Scanning...' : result ? 'Scan Another Bottle' : 'Start Scanning'}
       </button>
       
-      {!user && (
+      {!isLoggedIn && (
         <p className="mt-3 text-sm text-bebapay-orange text-center">
           Please sign in to scan bottles and earn tokens.
         </p>
