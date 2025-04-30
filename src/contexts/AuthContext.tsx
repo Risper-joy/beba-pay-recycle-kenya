@@ -1,7 +1,16 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+
+// Define a simplified Session and User type to match our mock implementation
+type User = {
+  id: string;
+  email?: string;
+};
+
+type Session = {
+  user: User;
+};
 
 type AuthContextType = {
   session: Session | null;
@@ -22,43 +31,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Get session from Supabase
     const fetchSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
+      const { data, error } = await supabase.auth.getSession();
+      const sessionData = data?.session;
+      setSession(sessionData || null);
+      setUser(sessionData?.user || null);
       setLoading(false);
     };
     
     fetchSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+    const { data } = supabase.auth.onAuthStateChange(
+      (_event: string, session: Session | null) => {
         setSession(session);
-        setUser(session?.user ?? null);
+        setUser(session?.user || null);
         setLoading(false);
       }
     );
 
     return () => {
-      subscription.unsubscribe();
+      data.subscription.unsubscribe();
     };
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
+    const { error } = await supabase.auth.signInWithPassword();
     return { error };
   };
 
   const signUp = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
+    const { data, error } = await supabase.auth.signUp();
     return { data, error };
   };
 
